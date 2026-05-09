@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAccount, useConnect, useDisconnect, useBalance, useReadContract, useWalletClient } from 'wagmi'
 import { coinbaseWallet, metaMask } from 'wagmi/connectors'
 import { parseEther, formatEther, encodeFunctionData } from 'viem'
+import Mint from './Mint.jsx'
 
 const CONTRACT_ADDRESS = '0xD6Eaa2053Fd592185211d514Ed70cF8dF26EBbF8'
 
@@ -10,7 +11,7 @@ const ABI = [
   { name: 'getTips', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'tuple[]', components: [{ name: 'from', type: 'address' }, { name: 'amount', type: 'uint256' }, { name: 'message', type: 'string' }, { name: 'timestamp', type: 'uint256' }] }] },
 ]
 
-function App() {
+function TipJar({ onNavigate }) {
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
   const { disconnect } = useDisconnect()
@@ -43,6 +44,7 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', padding: '20px' }}>
+      <button onClick={() => onNavigate('mint')} style={{ position: 'fixed', top: '16px', right: '16px', background: 'linear-gradient(135deg,#f97316,#ef4444)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', zIndex: 999 }}>🏰 Mint NFT</button>
       <div style={{ width: '100%', maxWidth: '480px' }}>
         <div style={{ background: '#1a1a1a', borderRadius: '16px', padding: '40px', boxShadow: '0 0 40px rgba(0,82,255,0.2)', marginBottom: '20px' }}>
           <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>☕ Tip Jar</h1>
@@ -57,44 +59,30 @@ function App() {
 
           {!isConnected ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button onClick={() => connect({ connector: metaMask() })} style={{ width: '100%', padding: '14px', background: '#f6851b', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-                🦊 Connect MetaMask
-              </button>
-              <button onClick={() => connect({ connector: coinbaseWallet({ appName: 'Tip Jar' }) })} style={{ width: '100%', padding: '14px', background: '#0052ff', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-                🔵 Connect Coinbase Wallet
-              </button>
+              <button onClick={() => connect({ connector: metaMask() })} style={{ width: '100%', padding: '14px', background: '#f6851b', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>🦊 Connect MetaMask</button>
+              <button onClick={() => connect({ connector: coinbaseWallet({ appName: 'Tip Jar' }) })} style={{ width: '100%', padding: '14px', background: '#0052ff', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>🔵 Connect Coinbase Wallet</button>
             </div>
           ) : (
             <>
               <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '24px' }}>Connected: {address.slice(0, 6)}...{address.slice(-4)}</p>
-
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', color: '#aaa' }}>Amount (ETH)</label>
-                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} step="0.0001"
-                  style={{ width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #333', borderRadius: '8px', color: 'white', fontSize: '1rem', boxSizing: 'border-box' }} />
+                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} step="0.0001" style={{ width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #333', borderRadius: '8px', color: 'white', fontSize: '1rem', boxSizing: 'border-box' }} />
               </div>
-
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', color: '#aaa' }}>Message (optional)</label>
-                <input type="text" value={message} onChange={e => setMessage(e.target.value)} placeholder="Great work!"
-                  style={{ width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #333', borderRadius: '8px', color: 'white', fontSize: '1rem', boxSizing: 'border-box' }} />
+                <input type="text" value={message} onChange={e => setMessage(e.target.value)} placeholder="Great work!" style={{ width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #333', borderRadius: '8px', color: 'white', fontSize: '1rem', boxSizing: 'border-box' }} />
               </div>
-
-              <button onClick={handleTip} disabled={sending}
-                style={{ width: '100%', padding: '14px', background: sending ? '#333' : '#0052ff', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: sending ? 'not-allowed' : 'pointer' }}>
+              <button onClick={handleTip} disabled={sending} style={{ width: '100%', padding: '14px', background: sending ? '#333' : '#0052ff', border: 'none', borderRadius: '10px', color: 'white', fontSize: '1rem', fontWeight: 'bold', cursor: sending ? 'not-allowed' : 'pointer' }}>
                 {sending ? 'Sending...' : `Send ${amount} ETH ☕`}
               </button>
-
               {txHash && (
                 <div style={{ marginTop: '16px', padding: '12px', background: '#00ff8822', border: '1px solid #00ff8844', borderRadius: '8px' }}>
                   <p style={{ margin: 0, color: '#00ff88', fontSize: '0.85rem' }}>Tip sent! 🎉</p>
-                  <a href={`https://sepolia.basescan.org/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ color: '#00ff88', fontSize: '0.8rem' }}>View on Basescan →</a>
+                  <a href={`https://basescan.org/tx/${txHash}`} target="_blank" rel="noreferrer" style={{ color: '#00ff88', fontSize: '0.8rem' }}>View on Basescan →</a>
                 </div>
               )}
-
-              <button onClick={() => disconnect()} style={{ width: '100%', marginTop: '12px', padding: '10px', background: 'transparent', border: '1px solid #333', borderRadius: '10px', color: '#888', fontSize: '0.9rem', cursor: 'pointer' }}>
-                Disconnect
-              </button>
+              <button onClick={() => disconnect()} style={{ width: '100%', marginTop: '12px', padding: '10px', background: 'transparent', border: '1px solid #333', borderRadius: '10px', color: '#888', fontSize: '0.9rem', cursor: 'pointer' }}>Disconnect</button>
             </>
           )}
         </div>
@@ -117,6 +105,13 @@ function App() {
       </div>
     </div>
   )
+}
+
+function App() {
+  const [page, setPage] = useState('tipjar')
+  return page === 'mint'
+    ? <div><button onClick={() => setPage('tipjar')} style={{ position: 'fixed', top: '16px', left: '16px', background: '#1a1a1a', border: '1px solid #333', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', zIndex: 999 }}>← Tip Jar</button><Mint /></div>
+    : <TipJar onNavigate={setPage} />
 }
 
 export default App

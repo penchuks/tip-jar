@@ -3,7 +3,7 @@ import { useAccount, useConnect, useDisconnect, useBalance, useReadContract, use
 import { coinbaseWallet, metaMask } from 'wagmi/connectors'
 import { parseEther, formatEther, encodeFunctionData } from 'viem'
 
-const CONTRACT_ADDRESS = '0x016963FD025DA638D1380B9DB6Ca5E2FFf65F03E'
+const CONTRACT_ADDRESS = '0xD6Eaa2053Fd592185211d514Ed70cF8dF26EBbF8'
 
 const ABI = [
   { name: 'tip', type: 'function', stateMutability: 'payable', inputs: [{ name: 'message', type: 'string' }], outputs: [] },
@@ -20,8 +20,8 @@ function App() {
   const [txHash, setTxHash] = useState('')
   const [sending, setSending] = useState(false)
 
-  const { data: balance, refetch: refetchBalance } = useBalance({ address: CONTRACT_ADDRESS, chainId: 84532 })
-  const { data: tipHistory, refetch: refetchTips } = useReadContract({ address: CONTRACT_ADDRESS, abi: ABI, functionName: 'getTips', chainId: 84532 })
+  const { data: balance, refetch: refetchBalance } = useBalance({ address: CONTRACT_ADDRESS, chainId: 8453 })
+  const { data: tipHistory, refetch: refetchTips } = useReadContract({ address: CONTRACT_ADDRESS, abi: ABI, functionName: 'getTips', chainId: 8453 })
 
   const handleTip = async () => {
     try {

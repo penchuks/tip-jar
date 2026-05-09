@@ -46,7 +46,7 @@ function App() {
       <div style={{ width: '100%', maxWidth: '480px' }}>
         <div style={{ background: '#1a1a1a', borderRadius: '16px', padding: '40px', boxShadow: '0 0 40px rgba(0,82,255,0.2)', marginBottom: '20px' }}>
           <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>☕ Tip Jar</h1>
-          <p style={{ color: '#888', marginBottom: '32px' }}>Send a tip on Base Sepolia</p>
+          <<p style={{ color: '#888', marginBottom: '32px' }}>Send a tip on Base Mainnet</p>
 
           {balance && (
             <div style={{ background: '#0052ff22', border: '1px solid #0052ff44', borderRadius: '8px', padding: '12px 16px', marginBottom: '24px' }}>

@@ -3,6 +3,7 @@ import { useAccount, useConnect, useDisconnect, useBalance, useReadContract, use
 import { coinbaseWallet, metaMask } from 'wagmi/connectors'
 import { parseEther, formatEther, encodeFunctionData } from 'viem'
 import Mint from './Mint.jsx'
+import Token from './Token.jsx'
 
 const CONTRACT_ADDRESS = '0xD6Eaa2053Fd592185211d514Ed70cF8dF26EBbF8'
 
@@ -44,7 +45,10 @@ function TipJar({ onNavigate }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', padding: '20px' }}>
-      <button onClick={() => onNavigate('mint')} style={{ position: 'fixed', top: '16px', right: '16px', background: 'linear-gradient(135deg,#f97316,#ef4444)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', zIndex: 999 }}>🏰 Mint NFT</button>
+      <div style={{ position: 'fixed', top: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 999 }}>
+        <button onClick={() => onNavigate('token')} style={{ background: 'linear-gradient(135deg,#00ff88,#0052ff)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>⚽ WCT</button>
+        <button onClick={() => onNavigate('mint')} style={{ background: 'linear-gradient(135deg,#f97316,#ef4444)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🏰 Mint NFT</button>
+      </div>
       <div style={{ width: '100%', maxWidth: '480px' }}>
         <div style={{ background: '#1a1a1a', borderRadius: '16px', padding: '40px', boxShadow: '0 0 40px rgba(0,82,255,0.2)', marginBottom: '20px' }}>
           <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>☕ Tip Jar</h1>
@@ -109,9 +113,10 @@ function TipJar({ onNavigate }) {
 
 function App() {
   const [page, setPage] = useState('tipjar')
-  return page === 'mint'
-    ? <div><button onClick={() => setPage('tipjar')} style={{ position: 'fixed', top: '16px', left: '16px', background: '#1a1a1a', border: '1px solid #333', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', zIndex: 999 }}>← Tip Jar</button><Mint /></div>
-    : <TipJar onNavigate={setPage} />
+  const backBtn = <button onClick={() => setPage('tipjar')} style={{ position: 'fixed', top: '16px', left: '16px', background: '#1a1a1a', border: '1px solid #333', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', zIndex: 999 }}>← Back</button>
+  if (page === 'mint') return <div>{backBtn}<Mint /></div>
+  if (page === 'token') return <div>{backBtn}<Token /></div>
+  return <TipJar onNavigate={setPage} />
 }
 
 export default App
